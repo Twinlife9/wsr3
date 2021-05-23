@@ -61,6 +61,16 @@ class Request extends \yii\db\ActiveRecord
             ],
         ];
     }
+    public static function ListStatus(){
+        $arr = [
+            'Новая' => 'Новая',
+            'Решена' => 'Решена',
+        ];
+        if (Yii::$app->user->can("admin")){
+            array_merge($arr,["Отклонена" => "Отклонена"]);
+        }
+        return $arr;
+    }
 
     /**
      * {@inheritdoc}
@@ -76,6 +86,17 @@ class Request extends \yii\db\ActiveRecord
             [['imageFile1'], 'file', 'skipOnEmpty' => false, 'extensions' => 'png, jpg,png,bmp','maxSize'=>10*1024*1024],
             [['imageFile2'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg,png,bmp','maxSize'=>10*1024*1024],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::className(), 'targetAttribute' => ['category_id' => 'id']],
+            ['why_not', 'required', 'when' => function($model, $attribute) {
+                return $model->status == 'Отклонена';
+
+            }],
+            ['imageFile2', 'required', 'when' => function($model, $attribute) {
+                return $model->status == 'Решена';
+
+            }, 'enableClientValidation' => false],
+
+
+
         ];
     }
 
